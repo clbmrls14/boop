@@ -5,44 +5,51 @@ import './App.css';
 import axios from 'axios';
 
 class App extends Component {
-  state = {
-    quote: []
+  constructor(props) {
+    super(props)
+    this.state = {
+      error: null,
+      isLoaded: false,
+      quote: []
+    };
   }
 
   componentDidMount() {
-    axios.get('https://officeapi.dev/api/quotes/random')
-      .then(response => {
-        const quote = response.data;
-        this.setState({ quote });
+    fetch('https://quotes.rest/qod')
+      .then(response => response.json())
+      .then((result) => {
+        this.setState({
+          isLoaded: true,
+          quote: result.contents.quotes[0]
+        });
+      console.log(result);
+      },
+      (error) => {
+        this.setState({
+          isLoaded: true,
+          error
+        });
       })
   }
 
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {isToggleOn: false};
-  //   this.handleClick = this.handleClick.bind(this);
-  // }
-
-  // handleClick() {
-  //   this.setState(prevState => ({
-  //     isToggleOn: !prevState.isToggleOn
-  //   }));
-  // }
-
   render() {
-    return (
-      <div className="App">
-      <header className="App-header">
-        <div>
-          <h1>Hello, World!</h1>
-          {/* <button onClick={this.handleClick}>
-            {this.state.isToggleOn ? 'Boop' : 'Click Me'}
-          </button> */}
+    const {error, isLoaded, quote} = this.state;
+    if (error) {
+      return <div>Error: {error.message}</div>;
+    } else if (!isLoaded) {
+      return <div>Loading...</div>;
+    } else {
+      return (
+        <div className="App">
+          <header className="App-header">
+            <h1>{quote.quote}</h1>
+            <h4>{quote.author}</h4>
+          </header>
+          
         </div>
-        <Quote quote={this.state.quote} />
-      </header>
-    </div>
-    )
+        
+      );
+    }
   }
 }
 
